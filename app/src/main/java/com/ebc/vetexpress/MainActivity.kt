@@ -21,6 +21,11 @@ import com.ebc.vetexpress.ui.screens.DogImageScreen
 import com.ebc.vetexpress.ui.theme.VetExpressTheme
 import com.ebc.vetexpress.viewmodel.VeterinariaViewModel
 import com.ebc.vetexpress.viewmodel.VeterinariaViewModelFactory
+import com.ebc.vetexpress.ui.screens.DetalleVeterinariaScreen
+import androidx.compose.material.icons.filled.Person
+import com.ebc.vetexpress.ui.screens.PerfilScreen
+import com.ebc.vetexpress.ui.screens.EditarVeterinariaScreen
+
 
 class MainActivity : ComponentActivity() {
     private val database by lazy { AppDatabase.getDatabase(this) }
@@ -61,6 +66,12 @@ class MainActivity : ComponentActivity() {
                                 label = { Text("Perrito") },
                                 icon = { Icon(Icons.Filled.Favorite, contentDescription = null) }
                             )
+                            NavigationBarItem(
+                                selected = navController.currentDestination?.route == "perfil",
+                                onClick = { navController.navigate("perfil") },
+                                label = { Text("Perfil") },
+                                icon = { Icon(Icons.Filled.Person, contentDescription = null) }
+                            )
                         }
                     }
                 ) { padding ->
@@ -70,10 +81,46 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(padding)
                     ) {
                         composable("directorio") {
-                            DirectorioScreen(viewModel = viewModel)
+                            DirectorioScreen(
+                                viewModel = viewModel,
+                                onVeterinariaClick = { selectedVet, editar ->
+                                    navController.currentBackStackEntry?.savedStateHandle?.set("veterinaria", selectedVet)
+                                    navController.navigate(if (editar) "editar" else "detalle")
+                                }
+                            )
                         }
+
+                        composable("detalle") {
+                            val vet = navController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.get<Veterinaria>("veterinaria")
+
+                            vet?.let {
+                                DetalleVeterinariaScreen(vet = it)
+                            }
+                        }
+
                         composable("perrito") {
                             DogImageScreen()
+                        }
+
+                        composable("perfil") {
+                            PerfilScreen()
+                        }
+                        composable("editar") {
+                            val vet = navController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.get<Veterinaria>("veterinaria")
+
+                            vet?.let {
+                                EditarVeterinariaScreen(
+                                    vet = it,
+                                    viewModel = viewModel,
+                                    onGuardar = {
+                                        navController.popBackStack()
+                                    }
+                                )
+                            }
                         }
                     }
                 }

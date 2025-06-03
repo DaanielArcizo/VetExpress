@@ -2,6 +2,7 @@ package com.ebc.vetexpress.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(tableName = "veterinarias")
 data class Veterinaria(
@@ -9,6 +10,8 @@ data class Veterinaria(
     val nombre: String,
     val direccion: String,
     val telefono: String,
-    val servicios: String
-)
+    val servicios: String,
+    val esFavorita: Boolean = false
+) : Serializable
+
 

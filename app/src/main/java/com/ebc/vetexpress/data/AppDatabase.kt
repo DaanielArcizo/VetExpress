@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.ebc.vetexpress.data.model.Veterinaria
 
-@Database(entities = [Veterinaria::class], version = 1)
+@Database(entities = [Veterinaria::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun veterinariaDao(): VeterinariaDao
 
@@ -20,8 +20,12 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "vetexpress_db"
-                ).build().also { INSTANCE = it }
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
+                    .also { INSTANCE = it }
             }
         }
     }
 }
+
