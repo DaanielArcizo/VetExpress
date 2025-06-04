@@ -25,6 +25,7 @@ import com.ebc.vetexpress.ui.screens.DetalleVeterinariaScreen
 import androidx.compose.material.icons.filled.Person
 import com.ebc.vetexpress.ui.screens.PerfilScreen
 import com.ebc.vetexpress.ui.screens.EditarVeterinariaScreen
+import com.ebc.vetexpress.ui.screens.SplashScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -77,9 +78,12 @@ class MainActivity : ComponentActivity() {
                 ) { padding ->
                     NavHost(
                         navController = navController,
-                        startDestination = "directorio",
+                        startDestination = "splash",
                         modifier = Modifier.padding(padding)
                     ) {
+                        composable("splash") {
+                            SplashScreen(navController)
+                        }
                         composable("directorio") {
                             DirectorioScreen(
                                 viewModel = viewModel,
@@ -105,7 +109,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("perfil") {
-                            PerfilScreen()
+                            PerfilScreen(navController)
                         }
                         composable("editar") {
                             val vet = navController.previousBackStackEntry
@@ -121,6 +125,14 @@ class MainActivity : ComponentActivity() {
                                     }
                                 )
                             }
+                        }
+                        composable("agregar") {
+                            EditarVeterinariaScreen(
+                                viewModel = viewModel,
+                                onGuardar = {
+                                    navController.popBackStack()
+                                }
+                            )
                         }
                     }
                 }

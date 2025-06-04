@@ -10,14 +10,14 @@ import com.ebc.vetexpress.viewmodel.VeterinariaViewModel
 
 @Composable
 fun EditarVeterinariaScreen(
-    vet: Veterinaria,
+    vet: Veterinaria? = null,
     viewModel: VeterinariaViewModel,
     onGuardar: () -> Unit
 ) {
-    var nombre by remember { mutableStateOf(vet.nombre) }
-    var direccion by remember { mutableStateOf(vet.direccion) }
-    var telefono by remember { mutableStateOf(vet.telefono) }
-    var servicios by remember { mutableStateOf(vet.servicios) }
+    var nombre by remember { mutableStateOf(vet?.nombre ?: "") }
+    var direccion by remember { mutableStateOf(vet?.direccion ?: "") }
+    var telefono by remember { mutableStateOf(vet?.telefono ?: "") }
+    var servicios by remember { mutableStateOf(vet?.servicios ?: "") }
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Editar Veterinaria", style = MaterialTheme.typography.headlineSmall)
@@ -54,7 +54,12 @@ fun EditarVeterinariaScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(onClick = {
-            val veterinariaEditada = vet.copy(
+            val veterinariaEditada = vet?.copy(
+                nombre = nombre,
+                direccion = direccion,
+                telefono = telefono,
+                servicios = servicios
+            ) ?: Veterinaria(
                 nombre = nombre,
                 direccion = direccion,
                 telefono = telefono,

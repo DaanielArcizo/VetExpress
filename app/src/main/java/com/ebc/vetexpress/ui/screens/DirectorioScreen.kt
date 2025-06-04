@@ -23,6 +23,9 @@ import com.ebc.vetexpress.data.model.Veterinaria
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.Icons
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.runtime.*
 
 
 @Composable
@@ -32,6 +35,7 @@ fun DirectorioScreen(
 ) {
     val lista by viewModel.veterinarias.collectAsState()
     val context = LocalContext.current
+    var query by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -52,22 +56,39 @@ fun DirectorioScreen(
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(bottom = 8.dp)
         )
+        OutlinedTextField(
+            value = query,
+            onValueChange = { query = it },
+            label = { Text("Buscar veterinarias") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        )
+
+        val listaFiltrada = lista
+            .filter {
+                it.nombre.contains(query, ignoreCase = true) ||
+                        it.servicios.contains(query, ignoreCase = true)
+            }
+            .sortedByDescending { it.esFavorita }
 
         LazyColumn {
-            items(lista) { vet ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .clickable {
-                            onVeterinariaClick(vet, false)
-                        },
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
-                    shape = MaterialTheme.shapes.large,
-                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+            items(listaFiltrada) { vet ->
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn()
                 ) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .clickable { onVeterinariaClick(vet, false) },
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                        shape = MaterialTheme.shapes.large,
+                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                    )  {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             text = vet.nombre,
@@ -75,9 +96,9 @@ fun DirectorioScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = vet.direccion)
-                        Text(text = "Tel: ${vet.telefono}")
-                        Text(text = "Servicios: ${vet.servicios}")
+                        Text(text = "📍 ${vet.direccion}")
+                        Text(text = "📞 ${vet.telefono}")
+                        Text(text = "📋 ${vet.servicios}")
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Row(
@@ -132,4 +153,4 @@ fun DirectorioScreen(
         }
     }
 }
-
+}
